@@ -30,7 +30,7 @@ export class App extends Component {
   handleSubmit = async evt => {
     evt.preventDefault();
     const { name } = this.state;
-    this.setState({ status: "loading" ,page: 1});
+    this.setState({ status: "loading"});
     try {
       const response = await getPhotoServices(name);
       this.setState({ photos: response.hits, status: "fulfilled" }); 
@@ -41,28 +41,26 @@ export class App extends Component {
   }
 
   handleChangePage = async (targetPage) => {
-    const { name,  page} = this.state;
+    const { name} = this.state; // Используем per_page вместо page
     try {
-      await this.setState(
-        {
-          page: targetPage,
-        }
-      );
-      try {
-        const response = await getPhotoServices(name, page);
-        const newPhotos = response.hits;
-        this.setState((prevState) => ({
-          photos: [...prevState.photos, ...newPhotos],
-          status: "fulfilled",
-        }));
-      } catch (error) {
-        this.setState({ status: "rejected" });
-        throw new Error(error.message);
-      }
+      await this.setState({
+        page: targetPage,
+        status: "loading", // Установим статус в "loading" перед загрузкой новых фотографий
+      });
+  
+      const response = await getPhotoServices(name, targetPage); // Используем targetPage и per_page для получения данных
+      const newPhotos = response.hits;
+  
+      this.setState((prevState) => ({
+        photos: [...prevState.photos, ...newPhotos],
+        status: "fulfilled",
+      }));
     } catch (error) {
-      console.error("Error updating page:", error);
+      this.setState({ status: "rejected" });
+      throw new Error(error.message);
     }
   }
+  
   
 
 
