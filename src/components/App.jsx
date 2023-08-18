@@ -73,7 +73,7 @@ export class App extends Component {
 
 
  render() {
-  const {photos, per_page, page} = this.state
+  const {photos, page} = this.state
   return (
     <>
        <div className="App">
