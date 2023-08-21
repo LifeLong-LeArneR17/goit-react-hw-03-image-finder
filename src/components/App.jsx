@@ -4,6 +4,7 @@ import './App.css';
 import { ImageGallery } from "./ImageGallery/ImageGallery";
 import { getPhotoServices } from "./services/photo";
 import { Button } from "./Button/Button";
+import { Modal } from "./Modal/Modal";
 
 export class App extends Component {
   state = {
@@ -12,11 +13,17 @@ export class App extends Component {
     status: "idle",
     per_page: 12,
     page: 1,
+    modalImg: "",
+    shownModal: false,
   }
 
 
-  
-
+  toggleModal = (modalImg, modalAlt) => {
+    this.setState(prevState => ({
+      shownModal: !prevState.shownModal,
+      modalImg,
+    }));
+  };
 
   handleChange = (evt) => {
    const {name, value} = evt.target;
@@ -33,7 +40,7 @@ export class App extends Component {
     this.setState({ status: "loading"});
     try {
       const response = await getPhotoServices(name);
-      this.setState({ photos: response.hits, status: "fulfilled" }); 
+      this.setState({ photos: response.hits, status: "fulfilled"}); 
     } catch (error) {
       this.setState({ status: "rejected" });
       throw new Error(error.message);
@@ -66,7 +73,6 @@ export class App extends Component {
 
 
 
-  
 
 
 
@@ -76,8 +82,11 @@ export class App extends Component {
     <>
        <div className="App">
         <Searchbar name={this.state.name}  onChange = {this.handleChange} onSubmit ={this.handleSubmit}/>
-        <ImageGallery photos={this.state.photos} onClick= {this.onChangeGallery}/>
+        <ImageGallery photos={this.state.photos}  openModal={this.toggleModal}/>
        {photos.length > 0 && <Button totalPhotos={photos.length / page} currentPage={page} onChangePage={this.handleChangePage}/>}
+       {this.state.shownModal && (
+        <Modal openModal={this.toggleModal}   modalImg={this.state.modalImg}/>
+       )}
        </div>
     </>
    );
