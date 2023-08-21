@@ -5,7 +5,7 @@ import { ImageGallery } from "./ImageGallery/ImageGallery";
 import { getPhotoServices } from "./services/photo";
 import { Button } from "./Button/Button";
 import { Modal } from "./Modal/Modal";
-
+import { Loader } from "./Loader/Loader";
 export class App extends Component {
   state = {
     name : "",
@@ -48,7 +48,7 @@ export class App extends Component {
   }
 
   handleChangePage = async (targetPage) => {
-    const { name} = this.state; // Используем per_page вместо page
+    const { name} = this.state; 
     try {
       await this.setState({
         page: targetPage,
@@ -77,16 +77,25 @@ export class App extends Component {
 
 
  render() {
-  const {photos, page} = this.state
+  const {photos, page, status} = this.state
   return (
     <>
        <div className="App">
         <Searchbar name={this.state.name}  onChange = {this.handleChange} onSubmit ={this.handleSubmit}/>
-        <ImageGallery photos={this.state.photos}  openModal={this.toggleModal}/>
-       {photos.length > 0 && <Button totalPhotos={photos.length / page} currentPage={page} onChangePage={this.handleChangePage}/>}
-       {this.state.shownModal && (
-        <Modal openModal={this.toggleModal}   modalImg={this.state.modalImg}/>
-       )}
+       
+        {this.state.status === "loading" ? (
+  <Loader />
+) : (
+  <div>
+    <ImageGallery photos={this.state.photos} openModal={this.toggleModal} />
+    {photos.length > 0 && <Button totalPhotos={photos.length / page} currentPage={page} onChangePage={this.handleChangePage} />}
+    {this.state.shownModal && <Modal openModal={this.toggleModal} modalImg={this.state.modalImg} />}
+  </div>
+)}
+
+       
+       
+      
        </div>
     </>
    );
